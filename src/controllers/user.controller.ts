@@ -1,0 +1,59 @@
+import { Request, Response } from "express";
+import { getAllRoles, getAllUsers, getUserById, handleCreateUser, handleDeleteUser, updateUserById } from "services/user.service";
+import { name } from "ejs";
+
+const getHomePage = async (req: Request, res: Response) => {
+    // Get users
+    const users = await getAllUsers();
+
+    return res.render("home.ejs", {
+        users: users
+    })
+}
+
+const getCreateUserPage = async (req: Request, res: Response) => {
+    const roles = await getAllRoles();
+    return res.render("admin/user/create.ejs", {
+        roles: roles
+    })
+}
+
+const postCreateUser = async (req: Request, res: Response) => {
+
+    // Object detructuring
+    const { fullName, username, phone, role, address } = req.body;
+    const file = req.file;
+    const avatar = file?.filename ?? null;
+    // // handle create user
+
+    await handleCreateUser(fullName, username, address, phone, avatar);
+
+    return res.redirect("/admin/user")
+}
+
+const postDeleteUser = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const a = await handleDeleteUser(id);
+    return res.redirect("/")
+}
+
+const getViewUser = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    // Get user by ID
+    const user = await getUserById(id);
+    return res.render("view-user.ejs", {
+        id: id,
+        user: user
+    });
+}
+
+const postUpdateUser = async (req: Request, res: Response) => {
+    const { id, email, address, fullName } = req.body;
+    // Update user by ID
+    await updateUserById(id, email, address, fullName);
+
+    return res.redirect("/");
+}
+postUpdateUser
+
+export { getHomePage, getCreateUserPage, postCreateUser, postDeleteUser, getViewUser, postUpdateUser, updateUserById };
