@@ -2,6 +2,7 @@ import express from "express";
 import 'dotenv/config';
 import webRoutes from "./routes/web";
 import initDataBase from "config/seed";
+import { z } from "zod"; 
 
 const app = express();
 const PORT = process.env.PORT || 8080;
