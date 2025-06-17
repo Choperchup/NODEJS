@@ -1,7 +1,9 @@
 
 
-export const ACCOUNT_TYPE =  {
+export const ACCOUNT_TYPE = {
     SYSTEM: "SYSTEM",
     GOOGLE: "GOOGLE",
-    GITHUB: "GITHUB" 
+    GITHUB: "GITHUB"
 }
+
+export const TOTAL_ITEMS_PER_PAGE = 5;

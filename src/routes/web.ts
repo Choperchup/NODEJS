@@ -1,23 +1,48 @@
 import express, { Express } from 'express';
 import {
     getCreateUserPage, getHomePage, postCreateUser,
-    postDeleteUser, getViewUser, postUpdateUser
+    postDeleteUser, getViewUser, postUpdateUser,
+    getProductFilterPage
 } from 'controllers/user.controller';
-import { getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashBoardPage } from 'controllers/admin/dashboard.controller';
+import { getAdminOrderDetailPage, getAdminOrderPage, getAdminProductPage, getAdminUserPage, getDashBoardPage } from 'controllers/admin/dashboard.controller';
 import fileUploadMiddleware from 'src/middleware/multer';
-import { getProductPage } from 'controllers/client/product.controller';
+import { getCartPage, getCheckOutPage, getOrderHistoryPage, getProductPage, getThankYouPage, postAddProductToCart, postAddToCartFromDetailPage, postDeleteProductInCart, postHandleCartToCheckOut, postPlaceOrder } from 'controllers/client/product.controller';
 import { getAdminCreateProductPage, getViewProduct, postAdminCreateProduct, postDeleteProduct, postUpdateProduct } from 'controllers/admin/product.controller';
-import { getLoginPage, getRegisterPage } from 'controllers/client/auth.controller';
+import { getLoginPage, getRegisterPage, getSuccessRedirectPage, postLogout, postRegister } from 'controllers/client/auth.controller';
+import passport from 'passport';
+import { isAdmin, isLogin } from 'src/middleware/auth';
+
 
 const router = express.Router();
 
 const webRoutes = (app: Express) => {
     router.get("/", getHomePage);
+    router.get("/products", getProductFilterPage)
     // CLIENT ROUTES
-    router.get("/product/:id", getProductPage)
+    router.get("/product/:id", getProductPage);
+    router.get("/success-redirect", getSuccessRedirectPage);
     router.get("/login", getLoginPage);
-    router.get("/register", getRegisterPage);
+    router.post('/login', passport.authenticate('local', {
+        successRedirect: '/success-redirect',
+        failureRedirect: '/login',
+        failureMessage: true
+    }));
+    router.post("/logout", postLogout)
 
+
+
+    router.get("/register", getRegisterPage);
+    router.post("/register", postRegister);
+
+    router.post("/add-product-to-cart/:id", postAddProductToCart);
+    router.get("/cart", getCartPage);
+    router.post("/delete-product-in-cart/:id", postDeleteProductInCart);
+    router.post("/handle-cart-to-checkout", postHandleCartToCheckOut);
+    router.get("/checkout", getCheckOutPage);
+    router.post("/place-order", postPlaceOrder);
+    router.get("/thanks", getThankYouPage);
+    router.get("/order-history", getOrderHistoryPage);
+    router.post("/add-to-cart-from-detail-page/:id", postAddToCartFromDetailPage)
 
 
     // ADMIN ROUTES
@@ -35,13 +60,14 @@ const webRoutes = (app: Express) => {
 
     router.post("/admin/delete-product/:id", postDeleteProduct);
     router.get("/admin/view-product/:id", getViewProduct);
-    router.post("/admin/update-product",fileUploadMiddleware("image", "images/product"), postUpdateProduct)
+    router.post("/admin/update-product", fileUploadMiddleware("image", "images/product"), postUpdateProduct)
 
 
 
     router.get("/admin/order", getAdminOrderPage);
+    router.get("/admin/order/:id", getAdminOrderDetailPage);
 
-    app.use("/", router);
+    app.use("/", isAdmin, router);
 }
 
 export default webRoutes;

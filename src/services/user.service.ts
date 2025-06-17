@@ -1,7 +1,7 @@
 import getConnection from "config/database";
 import { PrismaClient } from '@prisma/client';
 import { prisma } from "config/client";
-import { ACCOUNT_TYPE } from "config/constant";
+import { ACCOUNT_TYPE, TOTAL_ITEMS_PER_PAGE } from "config/constant";
 import bcrypt from 'bcrypt';
 const saltRounds = 10;
 
@@ -10,6 +10,10 @@ const hashPassWord = async (plainText: string) => {
     return await bcrypt.hash(plainText, saltRounds);
 }
 
+
+const comparePassword = async (plainText: string, hashPassWord: string) => {
+    return await bcrypt.compare(plainText, hashPassWord);
+}
 
 const handleCreateUser = async (
     fullName: string,
@@ -31,15 +35,29 @@ const handleCreateUser = async (
             accountType: ACCOUNT_TYPE.SYSTEM,
             avatar: avatar,
             phone: phone,
-            roleId: +role 
+            roleId: +role
         }
     })
     return newUser;
 }
 
-const getAllUsers = async () => {
-    const users = await prisma.user.findMany();
+const getAllUsers = async (page: number) => {
+    const pageSize = TOTAL_ITEMS_PER_PAGE;
+    const skip = (page - 1) * pageSize;
+    const users = await prisma.user.findMany({
+        skip: skip,
+        take: pageSize
+    });
     return users;
+}
+
+// Phan trang
+const countTotalUserPages = async () => {
+    const pageSize = TOTAL_ITEMS_PER_PAGE;
+    const totalItems = await prisma.user.count()
+    const totalPages = Math.ceil(totalItems / pageSize);
+
+    return totalPages;
 }
 
 const getAllRoles = async () => {
@@ -66,7 +84,7 @@ const getUserById = async (id: string) => {
     return user;
 }
 
-const updateUserById = async (id: string, fullName:string, phone:string, role:string, address:string, avatar:string) => {
+const updateUserById = async (id: string, fullName: string, phone: string, role: string, address: string, avatar: string) => {
     const updatedUser = await prisma.user.update({
         where: { id: +id },
         data: {
@@ -74,7 +92,7 @@ const updateUserById = async (id: string, fullName:string, phone:string, role:st
             phone: phone,
             roleId: +role,
             address: address,
-            ...(avatar !== undefined && {avatar: avatar})
+            ...(avatar !== undefined && { avatar: avatar })
         }
     })
     return updatedUser;
@@ -83,5 +101,6 @@ const updateUserById = async (id: string, fullName:string, phone:string, role:st
 
 export {
     handleCreateUser, getAllUsers, handleDeleteUser,
-    getUserById, updateUserById, getAllRoles, hashPassWord
+    getUserById, updateUserById, getAllRoles, hashPassWord, comparePassword,
+    countTotalUserPages
 }
