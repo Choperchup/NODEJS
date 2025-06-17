@@ -77,7 +77,7 @@ const upDateProductById = async (
             quantity: quantity,
             factory: factory,
             target: target,
-            ...(imageUpload && { image: imageUpload })
+            ...(imageUpload !== undefined && { image: imageUpload })
         }
     })
 

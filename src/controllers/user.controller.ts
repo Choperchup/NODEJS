@@ -26,6 +26,7 @@ const getProductFilterPage = async (req: Request, res: Response) => {
     const { page } = req.query;
     let currentPage = page ? +page : 1;
 
+    
     if (currentPage <= 0) currentPage = 1;
 
     const totalPages = await countTotalProductClientPages(6);

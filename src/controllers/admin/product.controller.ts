@@ -97,8 +97,8 @@ const postUpdateProduct = async (req: Request, res: Response) => {
         price, detailDesc, shortDesc,
         quantity, factory, target
     } = req.body as TProductSchema;
-
-    const image = req?.file?.fieldname ?? null;
+    const file = req.file;
+    const image = file?.filename ?? undefined;
 
     await upDateProductById(
         +id, name, +price, detailDesc, shortDesc,
