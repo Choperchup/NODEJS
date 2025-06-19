@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { getAllRoles, getAllUsers, getUserById, handleCreateUser, handleDeleteUser, updateUserById } from "services/user.service";
 import { countTotalProductClientPages, getProduct } from "services/client/item.service";
-import { userFilter, yeuCau1, yeuCau2 } from "services/client/product.filter";
+import { getProductWithFilter, userFilter, } from "services/client/product.filter";
 
 
 const getHomePage = async (req: Request, res: Response) => {
@@ -23,18 +23,25 @@ const getHomePage = async (req: Request, res: Response) => {
 }
 
 const getProductFilterPage = async (req: Request, res: Response) => {
-    const { page } = req.query;
-    let currentPage = page ? +page : 1;
+    const { page, factory = "", target = "", price = "", sort = "" } = req.query as {
+        page?: string;
+        factory: string;
+        target: string;
+        price: string;
+        sort: string;
+    };
 
-    
+    let currentPage = page ? +page : 1;
     if (currentPage <= 0) currentPage = 1;
 
-    const totalPages = await countTotalProductClientPages(6);
+    // const totalPages = await countTotalProductClientPages(6);
+    // const products = await getProduct(currentPage, 6);
 
-    const products = await getProduct(currentPage, 6);
+    const data = await getProductWithFilter(currentPage, 6, factory, target, price, sort)
+
     return res.render("client/product/filter.ejs", {
-        products,
-        totalPages: +totalPages,
+        products: data.products,
+        totalPages: +data.totalPages,
         page: +currentPage
     })
 
