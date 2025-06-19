@@ -1,20 +1,27 @@
-const { error } = require("console");
-const { url } = require("inspector");
-const { type } = require("os");
-const { text } = require("stream/consumers");
+// const { error } = require("console");
+// const { url } = require("inspector");
+// const { type } = require("os");
+// const { text } = require("stream/consumers");
 
 (function ($) {
     "use strict";
 
     // Spinner
-    var spinner = function () {
-        setTimeout(function () {
-            if ($('#spinner').length > 0) {
-                $('#spinner').removeClass('show');
-            }
-        }, 1);
-    };
-    spinner(0);
+    // var spinner = function () {
+    //     setTimeout(function () {
+    //         if ($('#spinner').length > 0) {
+    //             $('#spinner').removeClass('show');
+    //         }
+    //     }, 1);
+    // };
+    // spinner(0);
+
+    $(window).on('load', function () {
+        const $spinner = $('#spinner');
+        if ($spinner.length > 0) {
+            $spinner.removeClass('show').hide(); // ẩn hoàn toàn
+        }
+    });
 
 
     // Fixed Navbar
